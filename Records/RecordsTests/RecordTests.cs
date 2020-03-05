@@ -15,51 +15,72 @@ namespace RecordsTests
         [Test]
         public void Record_MustNotHave_DefaultConstructor()
         {
-            typeof(OneRequiredIntFieldRecord).Should().NotHaveDefaultConstructor();
+            typeof(IntRecord).Should().NotHaveDefaultConstructor();
         }
 
 
         [Test]
-        public void OneRequiredValueFieldTest()
+        public void IntTest()
         {
-            var record = new OneRequiredIntFieldRecord(5);
+            var record = new IntRecord(5);
             record.Id.Should().Be(5);
         }
 
         [Test]
-        public void TwoRequiredFieldsTest()
+        public void StringTest()
         {
-            var record = new TwoRequiredFieldsRecord(5, "5");
+            var record = new StringRecord("5");
+            record.Id.Should().Be("5");
+        }
+
+        [Test]
+        public void IntAndStringTest()
+        {
+            var record = new IntAndStringRecord(5, "5");
             record.Id.Should().Be(5);
             record.Name.Should().Be("5");
         }
 
         [Test]
-        public void OneNotRequiredIntFieldTest_WhenHasValue()
+        public void NullableIntTest_WhenHasValue()
         {
-            var record = new OneNotRequiredIntFieldRecord(5);
+            var record = new NullableIntRecord(5);
             record.Id.Should().Be(5);
         }
 
         [Test]
-        public void OneNotRequiredIntFieldTest_WhenHasNoValue()
+        public void NullableIntTest_WhenNoValue()
         {
-            var record = new OneNotRequiredIntFieldRecord();
+            var record = new NullableIntRecord();
             record.Id.Should().BeNull();
         }
 
         [Test]
-        public void TwoComboFieldsTest_WhenHasAllValues()
+        public void NullableStringTest_WhenHasValue()
         {
-            var record = new TwoComboFieldsRecord("5", 5);
+            var record = new NullableStringRecord("5");
+            record.Id.Should().Be("5");
+        }
+
+        [Test]
+        public void NullableStringTest_WhenNoValue()
+        {
+            var record = new NullableStringRecord();
+            record.Id.Should().BeNull();
+        }
+
+        [Test]
+        public void NullableIntAndStringTest_WhenAllValues()
+        {
+            var record = new NullableIntAndStringRecord("5", 5);
             record.Id.Should().Be(5);
             record.Name.Should().Be("5");
         }
 
         [Test]
-        public void TwoComboFieldsTest_WhenHasNoAllValues()
+        public void NullableIntAndStringTest_WhenOnlyRequiredValues()
         {
-            var record = new TwoComboFieldsRecord("5");
+            var record = new NullableIntAndStringRecord("5");
             record.Id.Should().BeNull();
             record.Name.Should().Be("5");
         }
@@ -71,19 +92,31 @@ namespace RecordsTests
     }
 
     [Record]
-    internal partial class OneRequiredIntFieldRecord
+    internal partial class IntRecord
     {
         public int Id { get; }
     }
 
     [Record]
-    internal partial class OneNotRequiredIntFieldRecord
+    internal partial class StringRecord
+    {
+        public string Id { get; }
+    }
+
+    [Record]
+    internal partial class NullableIntRecord
     {
         public int? Id { get; }
     }
 
     [Record]
-    internal partial class TwoRequiredFieldsRecord
+    internal partial class NullableStringRecord
+    {
+        public string? Id { get; }
+    }
+
+    [Record]
+    internal partial class IntAndStringRecord
     {
         public int Id { get; }
 
@@ -91,7 +124,7 @@ namespace RecordsTests
     }
 
     [Record]
-    internal partial class TwoComboFieldsRecord
+    internal partial class NullableIntAndStringRecord
     {
         public int? Id { get; }
 

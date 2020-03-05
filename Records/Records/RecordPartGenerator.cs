@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Records
 {
@@ -18,10 +19,15 @@ namespace Records
 
         public ClassDeclarationSyntax Generate()
         {
-            return SyntaxFactory
-                .ClassDeclaration(applyTo.Identifier)
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword))
-                .AddMembers(CreateConstructor());
+            return ClassDeclaration(applyTo.Identifier)
+                .AddModifiers(Token(SyntaxKind.PartialKeyword))
+                .AddMembers(CreateConstructor())
+                .WithLeadingTrivia(NullablePragma(true));
+        }
+
+        private static SyntaxTrivia NullablePragma(bool active)
+        {
+            return Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), active));
         }
 
         private ConstructorDeclarationSyntax CreateConstructor()
@@ -37,9 +43,8 @@ namespace Records
             var statements = propertiesWithParameters
                 .Select(pair => CreateAssignment(pair.Property.Identifier, pair.Parameter.Identifier));
 
-            return SyntaxFactory
-                .ConstructorDeclaration(applyTo.Identifier)
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+            return ConstructorDeclaration(applyTo.Identifier)
+                .AddModifiers(Token(SyntaxKind.PublicKeyword))
                 .AddParameterListParameters(propertiesWithParameters.Select(p => p.Parameter).ToArray())
                 .AddBodyStatements(statements.ToArray());
         }
@@ -47,40 +52,28 @@ namespace Records
         private ParameterSyntax CreateConstructorParameterForProperty(PropertyDeclarationSyntax p)
         {
             var @default = !IsRequiredProperty(p)
-                ? SyntaxFactory.EqualsValueClause(SyntaxFactory.DefaultExpression(p.Type))
+                ? EqualsValueClause(DefaultExpression(p.Type))
                 : null;
 
-            return SyntaxFactory
-                .Parameter(SyntaxFactory.Identifier(ToCamelCase(p.Identifier.Text)))
+            return Parameter(Identifier(ToCamelCase(p.Identifier.Text)))
                 .WithType(p.Type)
                 .WithDefault(@default);
         }
 
         private bool IsRequiredProperty(PropertyDeclarationSyntax p)
         {
-            if (!(semanticModel.GetTypeInfo(p.Type).Type is INamedTypeSymbol type))
-                return false;
-
-            return !IsNullableValueType(type) || !IsNullableReferenceType(type);
+            return !IsNullableProperty(p);
         }
 
-        private static bool IsNullableValueType(INamedTypeSymbol type)
+        private bool IsNullableProperty(PropertyDeclarationSyntax property)
         {
-            return type.IsValueType && type.IsGenericType && type.ConstructUnboundGenericType().Name == "Nullable";
-        }
-
-        private static bool IsNullableReferenceType(ITypeSymbol type)
-        {
-            return true;
+            return semanticModel.GetDeclaredSymbol(property).NullableAnnotation == NullableAnnotation.Annotated;
         }
 
         private static ExpressionStatementSyntax CreateAssignment(SyntaxToken left, SyntaxToken right)
         {
-            var assignment = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                SyntaxFactory.IdentifierName(left),
-                SyntaxFactory.IdentifierName(right));
-
-            return SyntaxFactory.ExpressionStatement(assignment);
+            var assignment = AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, IdentifierName(left), IdentifierName(right));
+            return ExpressionStatement(assignment);
         }
 
         private static string ToCamelCase(string name)
