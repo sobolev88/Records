@@ -47,6 +47,22 @@ namespace RecordsTests
             var record = new OneNotRequiredIntFieldRecord();
             record.Id.Should().BeNull();
         }
+
+        [Test]
+        public void TwoComboFieldsTest_WhenHasAllValues()
+        {
+            var record = new TwoComboFieldsRecord("5", 5);
+            record.Id.Should().Be(5);
+            record.Name.Should().Be("5");
+        }
+
+        [Test]
+        public void TwoComboFieldsTest_WhenHasNoAllValues()
+        {
+            var record = new TwoComboFieldsRecord("5");
+            record.Id.Should().BeNull();
+            record.Name.Should().Be("5");
+        }
     }
 
     [Record]
@@ -70,6 +86,14 @@ namespace RecordsTests
     internal partial class TwoRequiredFieldsRecord
     {
         public int Id { get; }
+
+        public string Name { get; }
+    }
+
+    [Record]
+    internal partial class TwoComboFieldsRecord
+    {
+        public int? Id { get; }
 
         public string Name { get; }
     }
