@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeGeneration.Roslyn;
@@ -25,25 +24,26 @@ namespace Records
                 return Task.FromResult(SyntaxFactory.List<MemberDeclarationSyntax>());
             }
 
-            var results = SyntaxFactory.SingletonList<MemberDeclarationSyntax>(CreateGeneratedPart(applyTo));
+            var results = SyntaxFactory.SingletonList<MemberDeclarationSyntax>(CreateGeneratedPart(applyTo, context.SemanticModel));
             return Task.FromResult(results);
         }
 
-        private static ClassDeclarationSyntax CreateGeneratedPart(ClassDeclarationSyntax applyTo)
+        private static ClassDeclarationSyntax CreateGeneratedPart(ClassDeclarationSyntax applyTo, SemanticModel semanticModel)
         {
             return SyntaxFactory
                 .ClassDeclaration(applyTo.Identifier)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword))
-                .AddMembers(CreateConstructor(applyTo));
+                .AddMembers(CreateConstructor(applyTo, semanticModel));
         }
 
-        private static ConstructorDeclarationSyntax CreateConstructor(ClassDeclarationSyntax applyTo)
+        private static ConstructorDeclarationSyntax CreateConstructor(ClassDeclarationSyntax applyTo, SemanticModel semanticModel)
         {
             var propertiesWithParameters = applyTo
                 .Members
                 .OfType<PropertyDeclarationSyntax>()
                 .Where(p => p.AccessorList == null || p.AccessorList.Accessors.All(a => a.Body == null))
-                .Select(p => (Property: p, Parameter: SyntaxFactory.Parameter(SyntaxFactory.Identifier(ToCamelCase(p.Identifier.Text))).WithType(p.Type)))
+                .OrderByDescending(p => IsRequiredProperty(p, semanticModel))
+                .Select(p => (Property: p, Parameter: CreateConstructorParameterForProperty(p, semanticModel)))
                 .ToArray();
 
             var statements = propertiesWithParameters
@@ -54,6 +54,36 @@ namespace Records
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
                 .AddParameterListParameters(propertiesWithParameters.Select(p => p.Parameter).ToArray())
                 .AddBodyStatements(statements.ToArray());
+        }
+
+        private static ParameterSyntax CreateConstructorParameterForProperty(PropertyDeclarationSyntax p, SemanticModel semanticModel)
+        {
+            var @default = !IsRequiredProperty(p, semanticModel)
+                ? SyntaxFactory.EqualsValueClause(SyntaxFactory.DefaultExpression(p.Type))
+                : null;
+
+            return SyntaxFactory
+                .Parameter(SyntaxFactory.Identifier(ToCamelCase(p.Identifier.Text)))
+                .WithType(p.Type)
+                .WithDefault(@default);
+        }
+
+        private static bool IsRequiredProperty(PropertyDeclarationSyntax p, SemanticModel semanticModel)
+        {
+            if (!(semanticModel.GetTypeInfo(p.Type).Type is INamedTypeSymbol type))
+                return false;
+
+            return !IsNullableValueType(type) || !IsNullableReferenceType(type);
+        }
+
+        private static bool IsNullableValueType(INamedTypeSymbol type)
+        {
+            return type.IsValueType && type.IsGenericType && type.ConstructUnboundGenericType().Name == "Nullable";
+        }
+
+        private static bool IsNullableReferenceType(ITypeSymbol type)
+        {
+            return true;
         }
 
         private static ExpressionStatementSyntax CreateAssignment(SyntaxToken left, SyntaxToken right)
