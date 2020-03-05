@@ -21,3 +21,5 @@ jobs:
       run: dotnet build Records/Records.sln --configuration Release
     - name: Run unit tests
       run: dotnet test Records/RecordsTests/RecordsTests.csproj
+    - name: Generate NuGet package
+      run: dotnet pack -c Release
