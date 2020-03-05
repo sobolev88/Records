@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Build with dotnet
-      run: dotnet build Records/Records.sln --configuration Release
+      run: dotnet build Records/Records.sln -c Release
     - name: Run unit tests
       run: dotnet test Records/RecordsTests/RecordsTests.csproj
     - name: Generate NuGet package
-      run: dotnet pack -c Release
+      run: dotnet pack Records/Records/Records.csproj -c Release
