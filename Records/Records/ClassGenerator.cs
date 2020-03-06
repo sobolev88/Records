@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,11 +12,13 @@ namespace Records
     {
         private readonly ClassDeclarationSyntax applyTo;
         private readonly SemanticModel semanticModel;
+        private readonly bool generateWith;
 
-        public ClassGenerator(ClassDeclarationSyntax applyTo, SemanticModel semanticModel)
+        public ClassGenerator(ClassDeclarationSyntax applyTo, SemanticModel semanticModel, bool generateWith)
         {
             this.applyTo = applyTo;
             this.semanticModel = semanticModel;
+            this.generateWith = generateWith;
         }
 
         public ClassDeclarationSyntax Generate()
@@ -22,6 +26,7 @@ namespace Records
             return ClassDeclaration(applyTo.Identifier)
                 .AddModifiers(Token(SyntaxKind.PartialKeyword))
                 .AddMembers(CreateConstructor())
+                .AddMembers(CreateWithMethods())
                 .WithLeadingTrivia(NullablePragma(true));
         }
 
@@ -32,11 +37,7 @@ namespace Records
 
         private ConstructorDeclarationSyntax CreateConstructor()
         {
-            var propertiesWithParameters = applyTo
-                .Members
-                .OfType<PropertyDeclarationSyntax>()
-                .Where(p => p.AccessorList == null || p.AccessorList.Accessors.All(a => a.Body == null))
-                .OrderByDescending(IsRequiredProperty)
+            var propertiesWithParameters = GetProperties()
                 .Select(p => (Property: p, Parameter: CreateConstructorParameterForProperty(p)))
                 .ToArray();
 
@@ -47,6 +48,43 @@ namespace Records
                 .AddModifiers(Token(SyntaxKind.PublicKeyword))
                 .AddParameterListParameters(propertiesWithParameters.Select(p => p.Parameter).ToArray())
                 .AddBodyStatements(statements.ToArray());
+        }
+
+        private IEnumerable<PropertyDeclarationSyntax> GetProperties()
+        {
+            return applyTo
+                            .Members
+                            .OfType<PropertyDeclarationSyntax>()
+                            .Where(p => p.AccessorList == null || p.AccessorList.Accessors.All(a => a.Body == null))
+                            .OrderByDescending(IsRequiredProperty);
+        }
+
+        private MethodDeclarationSyntax[] CreateWithMethods()
+        {
+            return generateWith
+                ? GetProperties()
+                .Select(WithMethod)
+                .ToArray()
+                : Array.Empty<MethodDeclarationSyntax>();
+        }
+
+        private MethodDeclarationSyntax WithMethod(PropertyDeclarationSyntax property)
+        {
+            var classType = ParseTypeName(applyTo.Identifier.Text);
+
+            var parameter = Parameter(Identifier(ToCamelCase(property.Identifier.Text))).WithType(property.Type);
+            return MethodDeclaration(classType, $"With{property.Identifier.Text}")
+                .AddParameterListParameters(parameter)
+                .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                .AddBodyStatements(ReturnStatement(ObjectCreationExpression(classType)
+                    .AddArgumentListArguments(WithArguments(property, parameter))));
+        }
+
+        private ArgumentSyntax[] WithArguments(PropertyDeclarationSyntax property, ParameterSyntax parameter)
+        {
+            return GetProperties()
+                .Select(p => Argument(p != property ? IdentifierName(p.Identifier) : IdentifierName(parameter.Identifier)))
+                .ToArray();
         }
 
         private ParameterSyntax CreateConstructorParameterForProperty(PropertyDeclarationSyntax property)

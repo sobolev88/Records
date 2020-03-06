@@ -11,9 +11,11 @@ namespace Records
 {
     public class RecordCodeGenerator : ICodeGenerator
     {
-        public RecordCodeGenerator(AttributeData _)
-        {
+        private readonly bool generateWith;
 
+        public RecordCodeGenerator(AttributeData attributeData)
+        {
+            generateWith = attributeData.ConstructorArguments.Select(a => a.Value).OfType<bool>().FirstOrDefault();
         }
 
         public Task<SyntaxList<MemberDeclarationSyntax>> GenerateAsync(TransformationContext context, IProgress<Diagnostic> progress, CancellationToken cancellationToken)
@@ -24,7 +26,7 @@ namespace Records
                 return Task.FromResult(SyntaxFactory.List<MemberDeclarationSyntax>());
             }
 
-            var generator = new ClassGenerator(applyTo, context.SemanticModel);
+            var generator = new ClassGenerator(applyTo, context.SemanticModel, generateWith);
             var results = SyntaxFactory.SingletonList<MemberDeclarationSyntax>(generator.Generate());
             return Task.FromResult(results);
         }

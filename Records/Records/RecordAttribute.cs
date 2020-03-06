@@ -9,5 +9,11 @@ namespace Records
     [CodeGenerationAttribute(typeof(RecordCodeGenerator))]
     public sealed class RecordAttribute : Attribute
     {
+        public RecordAttribute(bool with = false)
+        {
+            With = with;
+        }
+
+        public bool With { get; }
     }
 }

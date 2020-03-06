@@ -1,3 +1,4 @@
+using System;
 using FluentAssertions;
 using NUnit.Framework;
 using Records;
@@ -116,6 +117,38 @@ namespace RecordsTests
             record.Id.Should().Be(5);
             record.Name.Should().Be("5");
         }
+
+        [Test]
+        public void WithRecord()
+        {
+            var record = new WithRecord(5, true, "5");
+            record.Id.Should().Be(5);
+            record.Name.Should().Be("5");
+            record.Sex.Should().BeTrue();
+            
+            record = record.WithId(6);
+            record.Id.Should().Be(6);
+            record.Name.Should().Be("5");
+            record.Sex.Should().BeTrue();
+
+            record = record.WithName(null);
+            record.Id.Should().Be(6);
+            record.Name.Should().BeNull();
+            record.Sex.Should().BeTrue();
+
+            record = record.WithSex(false).WithName("a");
+            record.Id.Should().Be(6);
+            record.Name.Should().Be("a");
+            record.Sex.Should().BeFalse();
+        }
+
+        [Test]
+        public void NoWithRecord_MustNotHaveWithMethods()
+        {
+            typeof(IntRecord).Should().NotHaveMethod($"With{nameof(IntRecord.Id)}", new[] { typeof(int) });
+            typeof(NoWithRecord).Should().NotHaveMethod($"With{nameof(NoWithRecord.Id)}", new[] { typeof(int) });
+            typeof(NoWithRecord).Should().NotHaveMethod($"With{nameof(NoWithRecord.Name)}", new[] { typeof(string) });
+        }
     }
 
     [Record]
@@ -177,5 +210,20 @@ namespace RecordsTests
         public int Id { get; } = 5;
 
         public string Name { get; }
+    }
+
+    [Record(with: true)]
+    internal partial class WithRecord
+    {
+        public int Id { get; }
+        public string? Name { get; }
+        public bool Sex { get; }
+    }
+
+    [Record(with: false)]
+    internal partial class NoWithRecord
+    {
+        public int Id { get; }
+        public string? Name { get; }
     }
 }
