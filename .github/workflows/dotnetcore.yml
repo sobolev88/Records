@@ -24,6 +24,7 @@ jobs:
       
     - name: Run unit tests
       run: dotnet test Records/RecordsTests/RecordsTests.csproj
+            --no-build
 
     - name: Push package to nuget
       run: dotnet nuget push **/*.nupkg
