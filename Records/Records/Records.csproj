@@ -7,7 +7,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
     <RepositoryUrl>https://github.com/sobolev88/Records</RepositoryUrl>
     <Authors>Maxim Sobolev</Authors>
