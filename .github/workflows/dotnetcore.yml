@@ -20,11 +20,13 @@ jobs:
         dotnet-version: 3.1.101
         
     - name: Build with dotnet
-      run: dotnet build Records/Records.sln -c Release
+      run: dotnet build Records/Records.sln
+            -c Release
       
     - name: Run unit tests
       run: dotnet test Records/RecordsTests/RecordsTests.csproj
             --no-build
+            -c Release
 
     - name: Push package to nuget
       run: dotnet nuget push **/*.nupkg
