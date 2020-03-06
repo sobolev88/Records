@@ -28,3 +28,8 @@ jobs:
     - name: Generate nuget package
       run: dotnet pack --configuration Release -o nupkg
       working-directory: Records
+
+    - name: Push package to nuget
+      run: dotnet nuget push **/*.nupkg
+            --api-key ${{ secrets. NUGET_API_KEY }}
+            --source https://api.nuget.org/v3/index.json
