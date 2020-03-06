@@ -24,7 +24,7 @@ namespace Records
                 return Task.FromResult(SyntaxFactory.List<MemberDeclarationSyntax>());
             }
 
-            var generator = new RecordPartGenerator(applyTo, context.SemanticModel);
+            var generator = new ClassGenerator(applyTo, context.SemanticModel);
             var results = SyntaxFactory.SingletonList<MemberDeclarationSyntax>(generator.Generate());
             return Task.FromResult(results);
         }

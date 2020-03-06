@@ -84,6 +84,38 @@ namespace RecordsTests
             record.Id.Should().BeNull();
             record.Name.Should().Be("5");
         }
+
+        [Test]
+        public void IntAndDefaultStringTest_WhenAllValues()
+        {
+            var record = new IntAndDefaultStringRecord(5, "6");
+            record.Id.Should().Be(5);
+            record.Name.Should().Be("6");
+        }
+
+        [Test]
+        public void IntAndDefaultStringTest_WhenOnlyRequiredValues()
+        {
+            var record = new IntAndDefaultStringRecord(5);
+            record.Id.Should().Be(5);
+            record.Name.Should().Be("5");
+        }
+
+        [Test]
+        public void DefaultIntAndStringTest_WhenAllValues()
+        {
+            var record = new DefaultIntAndStringRecord("5", 6);
+            record.Id.Should().Be(6);
+            record.Name.Should().Be("5");
+        }
+
+        [Test]
+        public void DefaultIntAndStringTest_WhenOnlyRequiredValues()
+        {
+            var record = new DefaultIntAndStringRecord("5");
+            record.Id.Should().Be(5);
+            record.Name.Should().Be("5");
+        }
     }
 
     [Record]
@@ -127,6 +159,22 @@ namespace RecordsTests
     internal partial class NullableIntAndStringRecord
     {
         public int? Id { get; }
+
+        public string Name { get; }
+    }
+
+    [Record]
+    internal partial class IntAndDefaultStringRecord
+    {
+        public int Id { get; }
+
+        public string Name { get; } = "5";
+    }
+
+    [Record]
+    internal partial class DefaultIntAndStringRecord
+    {
+        public int Id { get; } = 5;
 
         public string Name { get; }
     }
