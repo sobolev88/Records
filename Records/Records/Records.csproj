@@ -7,11 +7,11 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-alpha</Version>
+    <Version>1.0-alpha</Version>
     <RepositoryUrl>https://github.com/sobolev88/Records</RepositoryUrl>
     <Authors>Maxim Sobolev</Authors>
     <PackageProjectUrl>https://github.com/sobolev88/Records</PackageProjectUrl>
-    <PackageTags>CSharp 8, Roslyn, CodeGeneration, Immutable, Records</PackageTags>
+    <PackageTags>CSharp8, Roslyn, CodeGeneration, Immutable, Records</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
