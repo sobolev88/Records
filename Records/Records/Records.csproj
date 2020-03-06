@@ -1,16 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="CodeGeneration.Roslyn.Plugin.Sdk" Version="0.7.5-alpha"/>
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <nullable>enable</nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.1</Version>
+    <Version>1.0.0-alpha</Version>
     <RepositoryUrl>https://github.com/sobolev88/Records</RepositoryUrl>
     <Authors>Maxim Sobolev</Authors>
     <PackageProjectUrl>https://github.com/sobolev88/Records</PackageProjectUrl>
     <PackageTags>CSharp 8, Roslyn, CodeGeneration, Immutable, Records</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CodeGeneration.Roslyn" Version="0.7.5-alpha" />
+  </ItemGroup>
 </Project>
