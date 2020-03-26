@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CodeGenerationRoslynPlugin Include="$(MSBuildThisFileDirectory)../lib/$(TargetFramework)/Records.dll" />
+    <PackageReference Include="CodeGeneration.Roslyn.BuildTime" Version="0.7.5-alpha">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <DotNetCliToolReference Include="dotnet-codegen" Version="0.7.5-alpha" />
+  </ItemGroup>
+</Project>
