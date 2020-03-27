@@ -1,6 +1,6 @@
 # Records
 
-[![GitHub Actions CI status](https://github.com/sobolev88/Records/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/sobolev88/Records/actions?query=workflow%3A%22.NET+Core%22+branch%3Amaster)
+[![GitHub Actions CI status](https://github.com/sobolev88/Records/workflows/CI/badge.svg?branch=master)](https://github.com/sobolev88/Records/actions?query=workflow%3ACI+branch%3Amaster)
 [![NuGet package](https://img.shields.io/nuget/v/Records.svg)](https://www.nuget.org/packages/Records)
 
 Immutable record types for c#
