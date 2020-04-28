@@ -7,8 +7,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <VersionPrefix>1.0.13</VersionPrefix>
-    <VersionSuffix>alpha</VersionSuffix>
+    <VersionPrefix>1.0.14</VersionPrefix>
     <RepositoryUrl>https://github.com/sobolev88/Records</RepositoryUrl>
     <Authors>Maxim Sobolev</Authors>
     <PackageProjectUrl>https://github.com/sobolev88/Records</PackageProjectUrl>
@@ -21,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CodeGeneration.Roslyn" Version="0.7.5-alpha" />
+    <PackageReference Include="CodeGeneration.Roslyn" Version="0.7.63" />
   </ItemGroup>
 
   <ItemGroup>
