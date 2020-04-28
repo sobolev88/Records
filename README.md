@@ -5,6 +5,11 @@
 
 Immutable record types for c#
 
+# Installation
+Install following nuget packages into your project:
+1. Records
+2. CodeGeneration.Roslyn.Tool
+
 # Features
 ## Constructor generating
 If we declare class `User` like this:
