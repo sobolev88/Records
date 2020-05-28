@@ -98,3 +98,7 @@ the following methods and constructor would be generated:
             return new User(FirstName, LastName, Id, middleName);
         }
 ```
+
+# C# 9
+[Good news!](https://devblogs.microsoft.com/dotnet/welcome-to-c-9-0/)   
+It seems Records will appear in C# 9
